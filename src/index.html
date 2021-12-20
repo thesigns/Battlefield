@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <title>Battlefield</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <script src="./js/main.js" type="module"></script>
+  </head>
+  <body>
+    <main>
+      <section class="description">
+        <h1>Battlefield</h1>
+        <h2>of Cellular Automata</h2>
+        <p>
+          This application allows you to observe a battle of two cellular
+          automata (the default rules for both of them is
+          <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
+            >Conway's Game of Life</a
+          >, but you can choose any variant). Each cell, dead or alive, belongs
+          to a gold or a black automaton. Every turn each alive cell counts
+          neigbouring allies and enemies. If there is more enemies than allies
+          plus one, the cell joins enemy automaton. Also when the cell is born
+          it switches sides if there is more enemies than allies around it.
+          Besides this the cells are born and survive according to the battle
+          settings.
+        </p>
+        <p>
+          Make the rules, make them fight and observe how the gold and black
+          madness breaks out :)
+        </p>
+        <p><a href="">Visit GitHub page of the project</a></p>
+      </section>
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 400 400"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+      ></svg>
+      <section class="rules">
+        <h2>Battle settings</h2>
+        <div class="settings"></div>
+        <p>
+          <button class="fight">Fight</button>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

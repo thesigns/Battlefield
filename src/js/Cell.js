@@ -34,6 +34,17 @@ export class Cell {
     return this._alive;
   }
   //
+  // Returns true if cell survives
+  //
+  willSurvive(neighbours) {
+    return this.automaton.rule.survives[neighbours - 1];
+  }
+
+  willBeBorn(neighbours) {
+    return this.automaton.rule.born[neighbours - 1];
+  }
+
+  //
   // cell dies
   //
   die() {
@@ -55,10 +66,12 @@ export class Cell {
   randomizeAlive(probability, setNextTurn) {
     if (Math.random() < probability) {
       this.alive = true;
-      if (setNextTurn) {
-        this._nextTurnAlive = this._alive;
-        this._nextTurnAutomaton = this._automaton;
-      }
+    } else {
+      this.alive = false;
+    }
+    if (setNextTurn) {
+      this._nextTurnAlive = this._alive;
+      this._nextTurnAutomaton = this._automaton;
     }
   }
   //

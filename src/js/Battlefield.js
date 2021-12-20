@@ -36,8 +36,8 @@ export class Battlefield {
         model.setAttribute("x", this.cellSizeX * x);
         model.setAttribute("y", this.cellSizeY * y);
         model.setAttribute("class", "model");
-        model.setAttribute("width", this.cellSizeX);
-        model.setAttribute("height", this.cellSizeY);
+        model.setAttribute("width", this.cellSizeX + 0.5);
+        model.setAttribute("height", this.cellSizeY + 0.5);
         model.style.animationDelay = Math.random() + "s";
         model.style.stroke = "none";
         model.style.fill = "none";
@@ -57,15 +57,22 @@ export class Battlefield {
     buttonFight.addEventListener("click", (e) => {
       if (!this.running) {
         this.running = setInterval(mainLoop, 0);
-        buttonFight.innerHTML = "Cease fire";
+        buttonFight.innerHTML = "Pause";
       } else {
         clearInterval(this.running);
         this.running = null;
         buttonFight.innerHTML = "Fight";
+
       }
     });
 
-
+    let buttonReset = document.querySelector("button.reset");
+    buttonReset.addEventListener("click", (e) => {
+        clearInterval(this.running);
+        this.running = null;
+        battle.prepare();
+        buttonFight.innerHTML = "Fight";
+    });
 
 
   }
@@ -83,6 +90,9 @@ export class Battlefield {
     let xmax = this.cellsNumX - 1;
     for (let y = 0; y < this.cellsNumY; y++) {
       for (let x = 0; x < this.cellsNumX; x++) {
+
+
+
         if (x < xmax) {
           this.cells[x][y].automaton = this.automatons[0];
         } else {
@@ -145,22 +155,21 @@ export class Battlefield {
           //
           // Survive rules
           //
-
-          
-          if (neighbours == 2 || neighbours == 3) {
+          if(self.willSurvive(neighbours)) {
             if (enemies > allies + 1) {
               self.join(enemyAutomaton);
             }
           } else {
             self.die();
           }
+
         } else {
           //
           // Born rules
           //
-          if (neighbours === 3) {
+          if (self.willBeBorn(neighbours)) {
             self.born();
-            if (enemies > allies) {
+            if (enemies > allies + 1) {
               self.join(enemyAutomaton);
             }
           }

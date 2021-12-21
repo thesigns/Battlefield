@@ -12,7 +12,7 @@ export class Automaton {
 
     // Create UI
     //
-    const settingsEl = document.querySelector("div.settings");
+    const settingsEl = document.querySelector("div.rules");
 
     // Create header
     //

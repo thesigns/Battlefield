@@ -7,23 +7,59 @@ import { Cell } from "./Cell.js";
 
 export class Battlefield {
   constructor(svg, cellsNumY, cellsNumX) {
-    this.cellsNumX = cellsNumX;
-    this.cellsNumY = cellsNumY;
-    this.cellSizeX = svg.viewBox.baseVal.width / this.cellsNumX;
-    this.cellSizeY = svg.viewBox.baseVal.height / this.cellsNumY;
+    this.svg = svg;
     this.turn = 0;
-    let running = null;
-    let battle = this;
+
+    let battle = (this.battle = this);
 
     // No automatons at the beginning
     //
     this.automatons = [];
 
+    function battleLoop() {
+      battle.updateCells();
+    }
+
+    // Button behavior
+    //
+    let buttonFight = document.querySelector("button.fight");
+    buttonFight.addEventListener("click", (e) => {
+      if (!this.running) {
+        this.running = setInterval(battleLoop, 0);
+        buttonFight.innerHTML = "Pause";
+      } else {
+        clearInterval(this.running);
+        this.running = null;
+        buttonFight.innerHTML = "Fight";
+      }
+    });
+
+    let buttonReset = document.querySelector("button.reset");
+    buttonReset.addEventListener("click", (e) => {
+      clearInterval(this.running);
+      this.running = null;
+      this.battle.prepare();
+      buttonFight.innerHTML = "Fight";
+    });
+  }
+
+  // Reset board size
+  //
+  setSize(sx, sy) {
+    clearInterval(this.running);
+    this.running = null;
+    this.svg.innerHTML = "";
+
+    this.cellsNumX = sx;
+    this.cellsNumY = sy;
+    this.cellSizeX = this.svg.viewBox.baseVal.width / this.cellsNumX;
+    this.cellSizeY = this.svg.viewBox.baseVal.height / this.cellsNumY;
+
     // Create 2-dimensional array and fill it with Cell objects
     //
-    this.cells = new Array(cellsNumY)
+    this.cells = new Array(this.cellsNumY)
       .fill(0)
-      .map(() => new Array(cellsNumX).fill(0).map(() => new Cell()));
+      .map(() => new Array(this.cellsNumX).fill(0).map(() => new Cell()));
 
     // Create models (rectangles) and apply them to cells
     //
@@ -41,40 +77,12 @@ export class Battlefield {
         model.style.animationDelay = Math.random() + "s";
         model.style.stroke = "none";
         model.style.fill = "none";
-        svg.appendChild(model);
+        this.svg.appendChild(model);
         this.cells[x][y].model = model;
       }
     }
-
-    function mainLoop() {
-      battle.run();
-    }
-
-
-    // Button behavior
-    //
-    let buttonFight = document.querySelector("button.fight");
-    buttonFight.addEventListener("click", (e) => {
-      if (!this.running) {
-        this.running = setInterval(mainLoop, 0);
-        buttonFight.innerHTML = "Pause";
-      } else {
-        clearInterval(this.running);
-        this.running = null;
-        buttonFight.innerHTML = "Fight";
-
-      }
-    });
-
-    let buttonReset = document.querySelector("button.reset");
-    buttonReset.addEventListener("click", (e) => {
-        clearInterval(this.running);
-        this.running = null;
-        battle.prepare();
-        buttonFight.innerHTML = "Fight";
-    });
-
-
+    this.battle.prepare();
+    document.querySelector("button.fight").innerHTML = "Fight";
   }
 
   addAutomaton(name, settings) {
@@ -90,9 +98,6 @@ export class Battlefield {
     let xmax = this.cellsNumX - 1;
     for (let y = 0; y < this.cellsNumY; y++) {
       for (let x = 0; x < this.cellsNumX; x++) {
-
-
-
         if (x < xmax) {
           this.cells[x][y].automaton = this.automatons[0];
         } else {
@@ -109,7 +114,7 @@ export class Battlefield {
     }
   }
 
-  run() {
+  updateCells() {
     for (let y = 0; y < this.cellsNumY; y++) {
       for (let x = 0; x < this.cellsNumX; x++) {
         let self = this.cells[x][y];
@@ -155,14 +160,13 @@ export class Battlefield {
           //
           // Survive rules
           //
-          if(self.willSurvive(neighbours)) {
+          if (self.willSurvive(neighbours)) {
             if (enemies > allies + 1) {
               self.join(enemyAutomaton);
             }
           } else {
             self.die();
           }
-
         } else {
           //
           // Born rules
